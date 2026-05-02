@@ -1,0 +1,126 @@
+{
+  "samsung": {
+    "models": {
+      "SM-G998B": {
+        "name": "Galaxy S22 Ultra",
+        "chipset": "Snapdragon 8 Gen 1",
+        "android_versions": ["12", "13", "14"],
+        "frp_methods": ["talkback", "accessibility", "settings"],
+        "unlock_methods": ["oem_unlock", "vaultkeeper_bypass"],
+        "flash_protocol": "odin"
+      },
+      "SM-S911B": {
+        "name": "Galaxy S23",
+        "chipset": "Snapdragon 8 Gen 2",
+        "android_versions": ["13", "14"],
+        "frp_methods": ["talkback", "chromium_rce"],
+        "unlock_methods": ["oem_unlock", "vaultkeeper_bypass"],
+        "flash_protocol": "odin"
+      },
+      "SM-S918B": {
+        "name": "Galaxy S23 Ultra",
+        "chipset": "Snapdragon 8 Gen 2",
+        "android_versions": ["13", "14"],
+        "frp_methods": ["talkback", "chromium_rce"],
+        "unlock_methods": ["oem_unlock", "vaultkeeper_bypass"],
+        "flash_protocol": "odin"
+      }
+    }
+  },
+  "google": {
+    "models": {
+      "Pixel 8": {
+        "name": "Pixel 8",
+        "chipset": "Google Tensor G3",
+        "android_versions": ["14", "15"],
+        "frp_methods": ["adb_network", "setup_wizard"],
+        "unlock_methods": ["fastboot_oem_unlock"],
+        "flash_protocol": "fastboot"
+      },
+      "Pixel 8 Pro": {
+        "name": "Pixel 8 Pro",
+        "chipset": "Google Tensor G3",
+        "android_versions": ["14", "15"],
+        "frp_methods": ["adb_network", "setup_wizard"],
+        "unlock_methods": ["fastboot_oem_unlock"],
+        "flash_protocol": "fastboot"
+      }
+    }
+  },
+  "xiaomi": {
+    "models": {
+      "22111317PG": {
+        "name": "Xiaomi 13",
+        "chipset": "Snapdragon 8 Gen 2",
+        "android_versions": ["13", "14"],
+        "frp_methods": ["mi_account_bypass", "hyperos_settings"],
+        "unlock_methods": ["mi_unlock", "hyperos_bypass"],
+        "flash_protocol": "fastboot"
+      },
+      "2304FPN6DG": {
+        "name": "Xiaomi 14",
+        "chipset": "Snapdragon 8 Gen 3",
+        "android_versions": ["14"],
+        "frp_methods": ["mi_account_bypass", "hyperos_settings"],
+        "unlock_methods": ["mi_unlock", "hyperos_bypass"],
+        "flash_protocol": "fastboot"
+      }
+    }
+  },
+  "oneplus": {
+    "models": {
+      "LE2113": {
+        "name": "OnePlus 10 Pro",
+        "chipset": "Snapdragon 8 Gen 1",
+        "android_versions": ["11", "12", "13"],
+        "frp_methods": ["oxygenos_settings", "accessibility"],
+        "unlock_methods": ["oem_unlock", "deep_test"],
+        "flash_protocol": "fastboot"
+      },
+      "NE2213": {
+        "name": "OnePlus 11",
+        "chipset": "Snapdragon 8 Gen 2",
+        "android_versions": ["13", "14"],
+        "frp_methods": ["oxygenos_settings", "accessibility"],
+        "unlock_methods": ["oem_unlock", "deep_test"],
+        "flash_protocol": "fastboot"
+      }
+    }
+  },
+  "oppo": {
+    "models": {
+      "PEEM00": {
+        "name": "Oppo Find X5 Pro",
+        "chipset": "Snapdragon 8 Gen 1",
+        "android_versions": ["12", "13"],
+        "frp_methods": ["coloros_settings", "accessibility"],
+        "unlock_methods": ["oem_unlock", "deep_flash"],
+        "flash_protocol": "fastboot"
+      }
+    }
+  },
+  "vivo": {
+    "models": {
+      "V2227A": {
+        "name": "Vivo X80 Pro",
+        "chipset": "MediaTek Dimensity 9200",
+        "android_versions": ["13", "14"],
+        "frp_methods": ["funtouch_settings", "accessibility"],
+        "unlock_methods": ["oem_unlock", "meta_mode"],
+        "flash_protocol": "sp_flash"
+      }
+    }
+  },
+  "huawei": {
+    "models": {
+      "JAD-AL50": {
+        "name": "Huawei P40 Pro",
+        "chipset": "Kirin 990",
+        "android_versions": ["10", "11"],
+        "frp_methods": ["emui_settings", "accessibility"],
+        "unlock_methods": ["oem_unlock", "deep_test"],
+        "flash_protocol": "fastboot"
+      }
+    }
+  }
+}
