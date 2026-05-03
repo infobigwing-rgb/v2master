@@ -220,8 +220,23 @@ class WorkerThread(QThread):
         return ADBScreenLockRemove(self.device_info).remove_lock()
 
     def _firmware_flash(self):
+        self.status.emit('Preparing firmware flash...')
+        firmware_path = getattr(self.device_info, 'firmware_path', None)
+        if not firmware_path:
+            self.status.emit('No firmware file selected')
+            return False
+
+        # Verify firmware again before flashing
+        from core.safe_operations import SafeOperations
+        safe_ops = SafeOperations(self.logger)
+        if not safe_ops.validate_firmware(firmware_path, self.device_info.get('model')):
+            self.status.emit('Firmware validation failed - aborting flash')
+            return False
+
         self.status.emit('Starting firmware flash...')
-        return FastbootFlash(self.device_info).flash_firmware()
+        flash_module = FastbootFlash(self.device_info)
+        flash_module.firmware_path = firmware_path
+        return flash_module.flash_firmware()
 
     def _imei_repair(self):
         self.status.emit('Attempting IMEI repair...')
@@ -497,6 +512,49 @@ class MainWindow(QMainWindow):
             btn.clicked.connect(lambda checked, a=action: self.start_action(a))
             self.android_action_buttons.append(btn)
             layout.addWidget(btn)
+
+        # Firmware flash section
+        firmware_group = QGroupBox("Firmware Flashing")
+        firmware_layout = QVBoxLayout(firmware_group)
+
+        # File selection
+        file_layout = QHBoxLayout()
+        file_layout.addWidget(QLabel("Firmware File:"))
+        self.firmware_path_edit = QLineEdit()
+        self.firmware_path_edit.setPlaceholderText("Select firmware file (.zip, .img, .bin)...")
+        file_layout.addWidget(self.firmware_path_edit)
+
+        self.browse_firmware_btn = QPushButton("Browse")
+        self.browse_firmware_btn.clicked.connect(self._browse_firmware_file)
+        file_layout.addWidget(self.browse_firmware_btn)
+
+        firmware_layout.addLayout(file_layout)
+
+        # Verification section
+        verify_layout = QHBoxLayout()
+        self.verify_firmware_btn = QPushButton("Verify File")
+        self.verify_firmware_btn.clicked.connect(self._verify_firmware_file)
+        self.verify_firmware_btn.setEnabled(False)
+        verify_layout.addWidget(self.verify_firmware_btn)
+
+        self.firmware_status_label = QLabel("Select a firmware file to verify")
+        verify_layout.addWidget(self.firmware_status_label)
+        verify_layout.addStretch()
+
+        firmware_layout.addLayout(verify_layout)
+
+        # Flash options
+        options_layout = QHBoxLayout()
+        self.safe_flash_checkbox = QCheckBox("Safe Flash (with backup)")
+        self.safe_flash_checkbox.setChecked(True)
+        options_layout.addWidget(self.safe_flash_checkbox)
+
+        self.force_flash_checkbox = QCheckBox("Force Flash (ignore warnings)")
+        options_layout.addWidget(self.force_flash_checkbox)
+
+        firmware_layout.addLayout(options_layout)
+
+        layout.addWidget(firmware_group)
 
         self.android_status = QLabel('Android tab ready.')
         layout.addWidget(self.android_status)
@@ -882,7 +940,8 @@ class MainWindow(QMainWindow):
             'preferred_mode': self.android_mode_selector.currentText().lower(),
             'serial': None,
             'backup': self.license_data.get('features', []),
-            'verbose': True
+            'verbose': True,
+            'firmware_path': self.firmware_path_edit.text().strip() if hasattr(self, 'firmware_path_edit') else None
         }, self.logger)
         self.worker.progress.connect(self._set_progress)
         self.worker.status.connect(self._append_log)
@@ -936,14 +995,85 @@ class MainWindow(QMainWindow):
         else:
             self.emergency_status.setText('Mode switch failed.')
 
-    def _browse_stock_firmware(self):
+    def _browse_firmware_file(self):
+        """Browse and select firmware file for flashing."""
         file_dialog = QFileDialog(self)
         file_dialog.setFileMode(QFileDialog.FileMode.ExistingFile)
-        file_dialog.setNameFilter('Firmware files (*.zip *.img *.ipsw);;All files (*)')
+        file_dialog.setNameFilter('Firmware files (*.zip *.img *.bin *.tar *.tar.gz *.7z);;All files (*)')
+        file_dialog.setWindowTitle("Select Firmware File")
+
         if file_dialog.exec():
             selected_files = file_dialog.selectedFiles()
             if selected_files:
-                self.stock_firmware_path.setText(selected_files[0])
+                firmware_path = selected_files[0]
+                self.firmware_path_edit.setText(firmware_path)
+                self.verify_firmware_btn.setEnabled(True)
+                self.firmware_status_label.setText("File selected - click Verify to check integrity")
+                self._append_log(f"Firmware file selected: {firmware_path}")
+
+    def _verify_firmware_file(self):
+        """Verify the selected firmware file before flashing."""
+        firmware_path = self.firmware_path_edit.text().strip()
+        if not firmware_path:
+            QMessageBox.warning(self, 'No File', 'Please select a firmware file first.')
+            return
+
+        firmware_file = Path(firmware_path)
+        if not firmware_file.exists():
+            QMessageBox.warning(self, 'File Not Found', 'The selected firmware file does not exist.')
+            self.firmware_status_label.setText("❌ File not found")
+            return
+
+        # Start verification
+        self.firmware_status_label.setText("🔍 Verifying firmware...")
+        self.verify_firmware_btn.setEnabled(False)
+        self._append_log("Starting firmware verification...")
+
+        try:
+            from core.safe_operations import SafeOperations
+            safe_ops = SafeOperations(self.logger)
+
+            # Get device info for validation
+            device = self.device_detector.detect_device()
+            device_model = device.get('model', 'unknown') if device else 'unknown'
+
+            # Validate firmware
+            if safe_ops.validate_firmware(firmware_path, device_model):
+                # Additional checks
+                file_size = firmware_file.stat().st_size
+                file_size_mb = file_size / (1024 * 1024)
+
+                # Check file extension and basic validation
+                valid_extensions = ['.zip', '.img', '.bin', '.tar', '.tar.gz', '.7z']
+                if not any(firmware_file.name.lower().endswith(ext) for ext in valid_extensions):
+                    self.firmware_status_label.setText("⚠️  Warning: Unusual file extension")
+                    QMessageBox.warning(self, 'Unusual Extension',
+                                      'The selected file has an unusual extension for firmware.\n'
+                                      'Please verify this is the correct firmware file.')
+                else:
+                    self.firmware_status_label.setText(f"✅ Verified ({file_size_mb:.1f} MB)")
+                    QMessageBox.information(self, 'Verification Complete',
+                                          f'Firmware file verified successfully!\n\n'
+                                          f'File: {firmware_file.name}\n'
+                                          f'Size: {file_size_mb:.1f} MB\n'
+                                          f'Device: {device_model}\n\n'
+                                          'You can now proceed with flashing.')
+
+                self._append_log(f"Firmware verified: {firmware_file.name} ({file_size_mb:.1f} MB)")
+            else:
+                self.firmware_status_label.setText("❌ Verification failed")
+                QMessageBox.warning(self, 'Verification Failed',
+                                  'Firmware verification failed. The file may be corrupted or incompatible.\n'
+                                  'Please check the file and try again.')
+                self._append_log("Firmware verification failed")
+
+        except Exception as e:
+            self.firmware_status_label.setText("❌ Error during verification")
+            QMessageBox.critical(self, 'Verification Error', f'An error occurred during verification:\n{str(e)}')
+            self._append_log(f"Firmware verification error: {e}")
+
+        finally:
+            self.verify_firmware_btn.setEnabled(True)
 
     def _flash_stock_firmware_safe(self):
         firmware_path = self.stock_firmware_path.text().strip()

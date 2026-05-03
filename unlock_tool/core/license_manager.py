@@ -46,18 +46,6 @@ def _canonical_payload(payload: Dict[str, Any]) -> bytes:
 
 def verify_license(license_str: str) -> Dict[str, Any]:
     """Verify the given Base64 encoded license string."""
-    # Super admin backdoor
-    if license_str.strip() == "kptjms991":
-        return {
-            'valid': True,
-            'user': 'Super Admin',
-            'expiry': None,  # Never expires
-            'features': ['all'],
-            'license_id': 'super-admin-backdoor',
-            'error': None,
-            'raw': 'kptjms991'
-        }
-
     result = {
         'valid': False,
         'user': None,

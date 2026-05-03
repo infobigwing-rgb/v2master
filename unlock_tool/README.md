@@ -5,7 +5,7 @@ A comprehensive, production-ready Android device servicing tool supporting all m
 ## Features
 
 ### Core Features
-- **FRP (Google Account) Bypass** - Support for Android 5.0 through 15
+- **FRP (Google Account) Bypass** - Support for Android 5.0 through 16
 - **Bootloader Unlock/Relock** - Including locked OEM, Samsung VaultKeeper, Xiaomi HyperOS restrictions
 - **Firmware Flashing & Repair** - Full flashing, partial flashing, OTA update injection
 - **Screen Lock Removal** - PIN, Pattern, Password, Face Unlock, Fingerprint (with secure element bypass)
@@ -17,20 +17,20 @@ A comprehensive, production-ready Android device servicing tool supporting all m
 - **Qualcomm** - EDL 9008 mode, Firehose loaders for all chipsets
 - **MediaTek** - BootROM, Preloader, META mode, Download Agent
 - **Samsung** - Exynos, Snapdragon with Knox bypass
-- **Google Tensor** - Pixel 6/7/8/9 series
+- **Google Tensor** - Pixel 6-10, Pixel Fold series
 - **Huawei/Honor** - Kirin chipsets, HarmonyOS
-- **Apple** - iOS 15-18 (limited passcode bypass)
+- **Apple** - iOS 15-19 (limited passcode bypass)
 
 ### Device Support
 - Samsung Galaxy S/A/M/Z/F series (2022-2026)
-- Xiaomi Mi/Redmi/POCO/HyperOS devices
-- Oppo/OnePlus/Realme ColorOS/OxygenOS
-- Vivo/iQOO FuntouchOS/OriginOS
-- Google Pixel 6-10, Pixel Fold
+- Xiaomi Mi/Redmi/POCO/HyperOS devices (2023-2026)
+- Oppo/OnePlus/Realme ColorOS/OxygenOS (2023-2026)
+- Vivo/iQOO FuntouchOS/OriginOS (2023-2026)
+- Google Pixel 6-10, Pixel Fold (2021-2026)
 - Motorola Moto G/E/Edge (2022-2026)
-- Nothing Phone 1/2/3
-- Honor Magic/X series
-- Tecno/Infinix/Itel latest models
+- Nothing Phone 1/2/3 (2023-2026)
+- Honor Magic/X series (2023-2026)
+- Tecno/Infinix/Itel latest models (2024-2026)
 - ASUS ROG/Zenfone
 
 ## Installation

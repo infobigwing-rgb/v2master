@@ -42,6 +42,32 @@ class DeviceDetectorTests(unittest.TestCase):
         self.assertEqual(match['platform'], 'ios')
         self.assertEqual(match['mode'], 'normal')
 
+    def test_device_database_contains_2026_devices(self):
+        """Test that device database includes 2026 flagship devices"""
+        import json
+        from pathlib import Path
+        db_path = Path(__file__).parent.parent / 'database' / 'devices.json'
+        with db_path.open('r', encoding='utf-8') as fp:
+            db = json.load(fp)
+
+        # Check for Android 16 support in Pixel 10
+        google_devices = db.get('google', {}).get('models', {})
+        pixel_10 = google_devices.get('Pixel 10')
+        self.assertIsNotNone(pixel_10)
+        self.assertIn('16', pixel_10.get('android_versions', []))
+
+        # Check for iOS 19 support
+        ios_devices = db.get('ios', {}).get('models', {})
+        iphone_17 = ios_devices.get('iPhone17,3')  # iPhone 17 Pro
+        self.assertIsNotNone(iphone_17)
+        self.assertIn('19', iphone_17.get('ios_versions', []))
+
+        # Check for Samsung S26
+        samsung_devices = db.get('samsung', {}).get('models', {})
+        s26 = samsung_devices.get('SM-S946B')
+        self.assertIsNotNone(s26)
+        self.assertIn('16', s26.get('android_versions', []))
+
 
 if __name__ == '__main__':
     unittest.main()
