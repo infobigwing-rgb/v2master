@@ -1075,6 +1075,20 @@ class MainWindow(QMainWindow):
         finally:
             self.verify_firmware_btn.setEnabled(True)
 
+    def _browse_stock_firmware(self):
+        """Browse and select stock firmware file for emergency flashing."""
+        file_dialog = QFileDialog(self)
+        file_dialog.setFileMode(QFileDialog.FileMode.ExistingFile)
+        file_dialog.setNameFilter('Firmware files (*.zip *.img *.bin *.tar *.tar.gz *.7z);;All files (*)')
+        file_dialog.setWindowTitle("Select Stock Firmware File")
+
+        if file_dialog.exec():
+            selected_files = file_dialog.selectedFiles()
+            if selected_files:
+                firmware_path = selected_files[0]
+                self.stock_firmware_path.setText(firmware_path)
+                self._append_log(f"Stock firmware file selected: {firmware_path}")
+
     def _flash_stock_firmware_safe(self):
         firmware_path = self.stock_firmware_path.text().strip()
         if not firmware_path:

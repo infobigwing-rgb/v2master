@@ -15,11 +15,24 @@ class PlatformToolLocator:
         self.logger = logger or Logger()
         self.project_root = Path(__file__).resolve().parent.parent
 
+        # Handle PyInstaller bundled exe
+        import sys
+        if getattr(sys, 'frozen', False):
+            self.exe_dir = Path(sys.executable).resolve().parent
+        else:
+            self.exe_dir = self.project_root
+
     def _candidate_paths(self, tool_name: str) -> list[Path]:
         candidates: list[Path] = []
-        local_dir = self.project_root / "platform-tools"
         extensions = ["", ".exe"] if platform.system() == "Windows" else [""]
 
+        # Check next to the executable first (for bundled app)
+        exe_platform_tools = self.exe_dir / "platform-tools"
+        for ext in extensions:
+            candidates.append(exe_platform_tools / f"{tool_name}{ext}")
+
+        # Check project root
+        local_dir = self.project_root / "platform-tools"
         for ext in extensions:
             candidates.append(local_dir / f"{tool_name}{ext}")
             candidates.append(local_dir / "lib64" / f"{tool_name}{ext}")
