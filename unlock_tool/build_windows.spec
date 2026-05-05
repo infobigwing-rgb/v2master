@@ -6,13 +6,19 @@ from pathlib import Path
 ROOT_DIR = Path(os.getcwd()).resolve()
 
 binaries = []
-datas = [
-    (str(ROOT_DIR / 'devices.json'), '.'),
-    (str(ROOT_DIR / 'drivers'), 'drivers'),
-    (str(ROOT_DIR / 'assets'), 'assets'),
-    (str(ROOT_DIR / 'README_Windows.md'), '.'),
-    (str(ROOT_DIR / 'EULA.txt'), '.'),
-]
+datas = []
+
+# Only add files/directories that exist
+if (ROOT_DIR / 'devices.json').exists():
+    datas.append((str(ROOT_DIR / 'devices.json'), '.'))
+if (ROOT_DIR / 'drivers').exists():
+    datas.append((str(ROOT_DIR / 'drivers'), 'drivers'))
+if (ROOT_DIR / 'assets').exists():
+    datas.append((str(ROOT_DIR / 'assets'), 'assets'))
+if (ROOT_DIR / 'README_Windows.md').exists():
+    datas.append((str(ROOT_DIR / 'README_Windows.md'), '.'))
+if (ROOT_DIR / 'EULA.txt').exists():
+    datas.append((str(ROOT_DIR / 'EULA.txt'), '.'))
 
 # Windows-specific binaries
 if sys.platform == 'win32':
